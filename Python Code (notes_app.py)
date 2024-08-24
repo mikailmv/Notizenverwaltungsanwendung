@@ -1,0 +1,88 @@
+import os
+import json
+
+# Datei, die als Datenbank verwendet wird
+NOTES_FILE = "notizen.json"
+
+def load_notes():
+    """Lade vorhandene Notizen"""
+    if os.path.exists(NOTES_FILE):
+        with open(NOTES_FILE, "r", encoding="utf-8") as file:
+            return json.load(file)
+    return {}
+
+def save_notes(notes):
+    """Speichere die Notizen in der Datei"""
+    with open(NOTES_FILE, "w", encoding="utf-8") as file:
+        json.dump(notes, file, indent=4, ensure_ascii=False)
+
+def list_notes(notes):
+    """Liste alle Notizen auf"""
+    if not notes:
+        print("Keine Notizen vorhanden.")
+        return
+    for key, value in notes.items():
+        print(f"ID: {key}\nTitel: {value['title']}\nInhalt: {value['content']}\n")
+
+def add_note():
+    """Füge eine neue Notiz hinzu"""
+    title = input("Titel der Notiz: ")
+    content = input("Inhalt der Notiz: ")
+    notes = load_notes()
+    note_id = str(len(notes) + 1)
+    notes[note_id] = {"title": title, "content": content}
+    save_notes(notes)
+    print("Notiz hinzugefügt.")
+
+def edit_note():
+    """Bearbeite eine vorhandene Notiz"""
+    notes = load_notes()
+    note_id = input("Geben Sie die ID der zu bearbeitenden Notiz ein: ")
+    if note_id in notes:
+        title = input(f"Neuer Titel (aktuell: {notes[note_id]['title']}): ")
+        content = input(f"Neuer Inhalt (aktuell: {notes[note_id]['content']}): ")
+        notes[note_id] = {"title": title, "content": content}
+        save_notes(notes)
+        print("Notiz aktualisiert.")
+    else:
+        print("Notiz mit dieser ID nicht gefunden.")
+
+def delete_note():
+    """Lösche eine Notiz"""
+    notes = load_notes()
+    note_id = input("Geben Sie die ID der zu löschenden Notiz ein: ")
+    if note_id in notes:
+        del notes[note_id]
+        save_notes(notes)
+        print("Notiz gelöscht.")
+    else:
+        print("Notiz mit dieser ID nicht gefunden.")
+
+def main():
+    """Hauptmenü der Notizenverwaltungsanwendung"""
+    while True:
+        print("\nNotizenverwaltungsanwendung")
+        print("1. Notizen auflisten")
+        print("2. Notiz hinzufügen")
+        print("3. Notiz bearbeiten")
+        print("4. Notiz löschen")
+        print("5. Beenden")
+        choice = input("Wählen Sie eine Option: ")
+
+        if choice == "1":
+            notes = load_notes()
+            list_notes(notes)
+        elif choice == "2":
+            add_note()
+        elif choice == "3":
+            edit_note()
+        elif choice == "4":
+            delete_note()
+        elif choice == "5":
+            print("Programm beendet.")
+            break
+        else:
+            print("Ungültige Auswahl, bitte erneut versuchen.")
+
+if __name__ == "__main__":
+    main()
